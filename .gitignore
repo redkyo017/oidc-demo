@@ -1,0 +1,65 @@
+# Go (Golang) specific ignores
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+
+# Test binary
+*_test
+
+# Coverage output
+*.out
+
+# Dependency cache
+/pkg/
+/bin/
+
+# IDE specific files (e.g., VS Code, GoLand)
+.idea/
+.vscode/
+*.sublime-workspace
+*.iml
+
+# Next.js specific ignores
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+.next/
+/out/
+/build/
+
+# Cache
+.turbo/
+.cache/
+**/.eslintcache
+**/tsconfig.tsbuildinfo
+
+# Local environment variables
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+
+/backend/tmp
+# Next.js specific ignores
+# Dependencies
+/frontend/node_modules/
+/frontend/.pnp/
+/frontend/.pnp.js
+
+# Build output
+/frontend/.next/
+/frontend/out/
+/frontend/build/

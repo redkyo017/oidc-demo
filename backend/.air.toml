@@ -1,0 +1,28 @@
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ."
+bin = "./tmp/main"
+full_bin = "./tmp/main"
+args_bin = []
+
+[run]
+cmd = "./tmp/main"
+
+[watch]
+include_ext = ["go", "html"]
+
+[log]
+level = "debug"
+
+[color]
+app = ""
+build = "yellow"
+debug = "blue"
+main = "magenta"
+warn = "yellow"
+error = "red"
+
+[misc]

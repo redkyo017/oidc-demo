@@ -6,6 +6,7 @@ import (
 
 	// "encoding/json"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -123,8 +124,63 @@ func main() {
 	app.Get("/userinfo", userinfo)
 	app.Get("/api/resource", protectedResource)
 	app.Post("/logout", logout)
+	app.Get("/fetch-image", fetchImage)
 
 	log.Fatal(app.ListenTLS(":8080", "cert.pem", "key.pem"))
+}
+
+// A10:2021-Server-Side Request Forgery (SSRF)
+var allowedDomains = []string{"example.com", "google.com", "live.staticflickr.com"}
+
+func isAllowedURL(urlStr string) bool {
+	u, err := url.Parse(urlStr)
+	if err != nil {
+		return false
+	}
+
+	// Allow only http and https schemes
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+
+	// Disallow empty host
+	if u.Host == "" {
+		return false
+	}
+
+	// Whitelist checking
+	for _, d := range allowedDomains {
+		if u.Host == d || strings.HasSuffix(u.Host, "."+d) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func fetchImage(c *fiber.Ctx) error {
+	urlStr := c.Query("url")
+	if urlStr == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "URL parameter is missing"})
+	}
+
+	if !isAllowedURL(urlStr) {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "URL is not allowed"})
+	}
+
+	resp, err := http.Get(urlStr)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch image"})
+	}
+	defer resp.Body.Close()
+
+	c.Set("Content-Type", resp.Header.Get("Content-Type"))
+	_, err = io.Copy(c.Response().BodyWriter(), resp.Body)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to stream image"})
+	}
+
+	return nil
 }
 
 func logout(c *fiber.Ctx) error {
